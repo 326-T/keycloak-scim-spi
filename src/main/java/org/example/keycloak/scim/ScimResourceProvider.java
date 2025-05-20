@@ -3,6 +3,7 @@ package org.example.keycloak.scim;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
@@ -60,6 +61,25 @@ public class ScimResourceProvider implements RealmResourceProvider {
             user.getId(),
             user.isEnabled()
         )).toList()
+    );
+    return Response.ok(response).build();
+  }
+
+  @GET
+  @Path("v2/Users/{userId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getUser(@PathParam("userId") String userId) {
+
+    RealmModel realm = session.getContext().getRealm();
+    UserModel user = session.users().getUserById(realm, userId);
+
+    ScimUserResponse response = new ScimUserResponse(
+        List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
+        new ScimUserResponse.ScimUserName(user.getLastName(), user.getFirstName()),
+        List.of(new ScimUserResponse.ScimUserEmail(user.getEmail(), true)),
+        user.getUsername(),
+        user.getId(),
+        user.isEnabled()
     );
     return Response.ok(response).build();
   }

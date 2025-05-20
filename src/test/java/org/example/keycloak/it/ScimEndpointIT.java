@@ -26,7 +26,7 @@ class ScimEndpointIT {
 
   @Nested
   @DisplayName("SCIM API - List Users")
-  class ScimListUsersEndpointIT {
+  class ListUsers {
 
     @Test
     @DisplayName("無条件検索")
@@ -166,6 +166,56 @@ class ScimEndpointIT {
                   "0196EE58-EF67-C007-A708-00C1700184C2",
                   "taro.sato@example.org"
               )
+          );
+    }
+  }
+
+  @Nested
+  @DisplayName("SCIM API - Get User")
+  class GetUser {
+
+    @Test
+    @DisplayName("ユーザー情報取得")
+    void shouldReturnUserInfo() {
+      // given
+      String token = RestAssured.given()
+          .contentType("application/x-www-form-urlencoded")
+          .formParam("grant_type", "password")
+          .formParam("client_id", "test-client")
+          .formParam("username", "test-user")
+          .formParam("password", "password")
+          .post(keycloak.getAuthServerUrl() + "/realms/test/protocol/openid-connect/token")
+          .then().extract().path("access_token");
+      // when
+      ScimUserResponse body = RestAssured.given()
+          .header("Authorization", "Bearer " + token)
+          .get(keycloak.getAuthServerUrl()
+              + "/realms/test/scim/v2/Users/0196EE58-EF67-C007-A708-00C1700184C2")
+          .then()
+          .statusCode(200)
+          .extract().as(new TypeRef<>() {
+          });
+      // then
+      assertThat(body)
+          .extracting(
+              ScimUserResponse::schemas,
+              ScimUserResponse::id,
+              ScimUserResponse::userName,
+              ScimUserResponse::active,
+              u -> u.name().familyName(),
+              u -> u.name().givenName(),
+              u -> u.emails().getFirst().value(),
+              u -> u.emails().getFirst().primary()
+          )
+          .containsExactly(
+              List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
+              "0196EE58-EF67-C007-A708-00C1700184C2",
+              "taro.sato@example.org",
+              true,
+              "Sato",
+              "Taro",
+              "taro.sato@example.org",
+              true
           );
     }
   }
