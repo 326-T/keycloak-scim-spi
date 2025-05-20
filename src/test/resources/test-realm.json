@@ -4,8 +4,40 @@
   "enabled": true,
   "users": [
     {
-      "username": "test-user",
+      "id": "0196EE58-EF67-C007-A708-00C1700184C2",
+      "username": "taro.sato@example.org",
       "enabled": true,
+      "firstName": "Taro",
+      "lastName": "Sato",
+      "email": "taro.sato@example.org",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password"
+        }
+      ]
+    },
+    {
+      "id": "0196EE59-3C13-55F4-E475-DCD31F05F413",
+      "username": "jiro.suzuki@example.org",
+      "enabled": true,
+      "firstName": "Jiro",
+      "lastName": "Suzuki",
+      "email": "jiro.suzuki@example.org",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password"
+        }
+      ]
+    },
+    {
+      "id": "0196EE59-5858-5883-BAE4-9C539A3F13A6",
+      "username": "saburo.tanaka@example.org",
+      "enabled": true,
+      "firstName": "Saburo",
+      "lastName": "Tanaka",
+      "email": "saburo.tanaka@example.org",
       "credentials": [
         {
           "type": "password",
@@ -18,7 +50,9 @@
     {
       "clientId": "test-client",
       "enabled": true,
-      "redirectUris": ["*"],
+      "redirectUris": [
+        "*"
+      ],
       "publicClient": true,
       "protocol": "openid-connect"
     }
