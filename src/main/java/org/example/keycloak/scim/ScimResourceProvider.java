@@ -1,4 +1,4 @@
-package org.example.keycloak.hello;
+package org.example.keycloak.scim;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -8,11 +8,11 @@ import java.util.Map;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.resource.RealmResourceProvider;
 
-public class HelloResourceProvider implements RealmResourceProvider {
+public class ScimResourceProvider implements RealmResourceProvider {
 
   private final KeycloakSession session;
 
-  public HelloResourceProvider(KeycloakSession session) {
+  public ScimResourceProvider(KeycloakSession session) {
     this.session = session;
   }
 
@@ -26,6 +26,7 @@ public class HelloResourceProvider implements RealmResourceProvider {
   }
 
   @GET
+  @Path("v2/Users")
   @Produces(MediaType.APPLICATION_JSON)
   public Map<String, String> hello() {
     return Map.of("message", "Hello, World!");
