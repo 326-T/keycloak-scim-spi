@@ -1,0 +1,36 @@
+name: CI – Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # リポジトリをチェックアウト
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # JDK21 セットアップ
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # Maven キャッシュ（依存ライブラリ）
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      # ビルド＆統合テスト実行
+      # Failsafe プラグインが `*IT.java` を走らせる想定
+      - name: Build & run integration tests
+        run: mvn clean verify -B
