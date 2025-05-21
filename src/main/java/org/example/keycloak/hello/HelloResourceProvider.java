@@ -8,7 +8,6 @@ import java.util.Map;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.resource.RealmResourceProvider;
 
-@Path("hello")
 public class HelloResourceProvider implements RealmResourceProvider {
 
   private final KeycloakSession session;

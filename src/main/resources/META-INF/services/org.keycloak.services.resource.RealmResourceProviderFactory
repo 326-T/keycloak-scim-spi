@@ -1,1 +1,2 @@
+org.example.keycloak.scim.ScimResourceProviderFactory
 org.example.keycloak.hello.HelloResourceProviderFactory
