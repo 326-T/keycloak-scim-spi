@@ -66,7 +66,8 @@ class ScimEndpointIT {
               u -> u.name().familyName(),
               u -> u.name().givenName(),
               u -> u.emails().getFirst().value(),
-              u -> u.emails().getFirst().primary()
+              u -> u.emails().getFirst().primary(),
+              u -> u.meta().resourceType()
           )
           .containsExactlyInAnyOrder(
               tuple(
@@ -77,7 +78,8 @@ class ScimEndpointIT {
                   "Sato",
                   "Taro",
                   "taro.sato@example.org",
-                  true
+                  true,
+                  "User"
               ),
               tuple(
                   List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
@@ -87,7 +89,8 @@ class ScimEndpointIT {
                   "Suzuki",
                   "Jiro",
                   "jiro.suzuki@example.org",
-                  true
+                  true,
+                  "User"
               ),
               tuple(
                   List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
@@ -97,9 +100,15 @@ class ScimEndpointIT {
                   "Tanaka",
                   "Saburo",
                   "saburo.tanaka@example.org",
-                  true
+                  true,
+                  "User"
               )
           );
+      assertThat(body.resources())
+          .extracting(ScimUserResponse::meta)
+          .extracting(ScimUserResponse.ScimUserMeta::location)
+          .allMatch(location ->
+              location.matches("^http://localhost:[0-9]+/realms/test/scim/v2/Users/[0-9a-fA-F-]+$"));
     }
 
     @Test
@@ -208,7 +217,8 @@ class ScimEndpointIT {
               u -> u.name().familyName(),
               u -> u.name().givenName(),
               u -> u.emails().getFirst().value(),
-              u -> u.emails().getFirst().primary()
+              u -> u.emails().getFirst().primary(),
+              u -> u.meta().resourceType()
           )
           .containsExactly(
               List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
@@ -218,8 +228,11 @@ class ScimEndpointIT {
               "Sato",
               "Taro",
               "taro.sato@example.org",
-              true
+              true,
+              "User"
           );
+      assertThat(body.meta().location()).matches(
+          "^http://localhost:[0-9]+/realms/test/scim/v2/Users/0196EE58-EF67-C007-A708-00C1700184C2$");
     }
   }
 
@@ -288,7 +301,8 @@ class ScimEndpointIT {
               u -> u.name().familyName(),
               u -> u.name().givenName(),
               u -> u.emails().getFirst().value(),
-              u -> u.emails().getFirst().primary()
+              u -> u.emails().getFirst().primary(),
+              u -> u.meta().resourceType()
           )
           .containsExactly(
               List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
@@ -297,8 +311,11 @@ class ScimEndpointIT {
               "Saito",
               "Shiro",
               "shiro.saito@example.org",
-              true
+              true,
+              "User"
           );
+      assertThat(body.meta().location()).matches(
+          "^http://localhost:[0-9]+/realms/test/scim/v2/Users/[0-9a-fA-F-]+$");
     }
   }
 
@@ -377,7 +394,8 @@ class ScimEndpointIT {
               u -> u.name().familyName(),
               u -> u.name().givenName(),
               u -> u.emails().getFirst().value(),
-              u -> u.emails().getFirst().primary()
+              u -> u.emails().getFirst().primary(),
+              u -> u.meta().resourceType()
           )
           .containsExactly(
               List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
@@ -386,8 +404,11 @@ class ScimEndpointIT {
               "sato",
               "taro",
               "taro.sato@example.com",
-              true
+              true,
+              "User"
           );
+      assertThat(body.meta().location()).matches(
+          "^http://localhost:[0-9]+/realms/test/scim/v2/Users/0196EE58-EF67-C007-A708-00C1700184C2$");
     }
 
     @Test
@@ -452,7 +473,8 @@ class ScimEndpointIT {
               u -> u.name().familyName(),
               u -> u.name().givenName(),
               u -> u.emails().getFirst().value(),
-              u -> u.emails().getFirst().primary()
+              u -> u.emails().getFirst().primary(),
+              u -> u.meta().resourceType()
           )
           .containsExactly(
               List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
@@ -461,8 +483,11 @@ class ScimEndpointIT {
               null,
               null,
               null,
-              true
+              true,
+              "User"
           );
+      assertThat(body.meta().location()).matches(
+          "^http://localhost:[0-9]+/realms/test/scim/v2/Users/0196EE58-EF67-C007-A708-00C1700184C2$");
     }
   }
 }

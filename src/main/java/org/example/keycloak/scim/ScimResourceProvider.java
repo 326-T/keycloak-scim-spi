@@ -13,9 +13,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Objects;
+import org.example.keycloak.schemas.ScimCreateUserRequest;
 import org.example.keycloak.schemas.ScimListResponse;
 import org.example.keycloak.schemas.ScimPatchUserRequest;
-import org.example.keycloak.schemas.ScimCreateUserRequest;
 import org.example.keycloak.schemas.ScimUserResponse;
 import org.example.keycloak.util.ScimFilterUtil;
 import org.keycloak.models.KeycloakSession;
@@ -23,6 +23,7 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
+@SuppressWarnings("unused")
 public class ScimResourceProvider implements RealmResourceProvider {
 
   private final KeycloakSession session;
@@ -60,7 +61,9 @@ public class ScimResourceProvider implements RealmResourceProvider {
         count,
         startIndex,
         itemsPerPage,
-        users.stream().map(ScimUserResponse::new).toList()
+        users.stream()
+            .map(user -> new ScimUserResponse(user, realm, session.getContext().getUri()))
+            .toList()
     );
     return Response.ok(response).build();
   }
@@ -73,7 +76,7 @@ public class ScimResourceProvider implements RealmResourceProvider {
     RealmModel realm = session.getContext().getRealm();
     UserModel user = session.users().getUserById(realm, userId);
 
-    ScimUserResponse response = new ScimUserResponse(user);
+    ScimUserResponse response = new ScimUserResponse(user, realm, session.getContext().getUri());
     return Response.ok(response).build();
   }
 
@@ -89,7 +92,7 @@ public class ScimResourceProvider implements RealmResourceProvider {
     user.setEmail(request.emails().getFirst().value());
     user.setEnabled(request.active());
 
-    ScimUserResponse response = new ScimUserResponse(user);
+    ScimUserResponse response = new ScimUserResponse(user, realm, session.getContext().getUri());
     return Response.status(Response.Status.CREATED).entity(response).build();
   }
 
@@ -130,7 +133,7 @@ public class ScimResourceProvider implements RealmResourceProvider {
       }
     }
 
-    ScimUserResponse response = new ScimUserResponse(user);
+    ScimUserResponse response = new ScimUserResponse(user, realm, session.getContext().getUri());
     return Response.status(Response.Status.OK).entity(response).build();
   }
 }

@@ -1,8 +1,8 @@
 package org.example.keycloak.schemas;
 
-import java.time.OffsetDateTime;
 import java.util.List;
-import org.example.keycloak.schemas.ScimCreateUserRequest.ScimUserMeta;
+import org.keycloak.models.KeycloakUriInfo;
+import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 public record ScimUserResponse(
@@ -15,8 +15,11 @@ public record ScimUserResponse(
     boolean active,
     ScimUserMeta meta
 ) {
+
   public ScimUserResponse(
-      UserModel user
+      UserModel user,
+      RealmModel realm,
+      KeycloakUriInfo uriInfo
   ) {
     this(
         List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
@@ -27,7 +30,12 @@ public record ScimUserResponse(
         user.isEnabled(),
         new ScimUserMeta(
             "User",
-            "/Users/" + user.getId()
+            uriInfo.getBaseUriBuilder()
+                .path("realms")
+                .path(realm.getName())
+                .path("scim/v2/Users")
+                .path(user.getId())
+                .build().toString()
         )
     );
   }
