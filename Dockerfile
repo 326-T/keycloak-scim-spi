@@ -27,4 +27,4 @@ RUN /opt/keycloak/bin/kc.sh build
 # ────────────────
 FROM quay.io/keycloak/keycloak:26.2.4
 COPY --from=builder /opt/keycloak /opt/keycloak
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start", "--http-enabled=true"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start"]
