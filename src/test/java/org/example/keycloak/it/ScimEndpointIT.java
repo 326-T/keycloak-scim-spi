@@ -108,7 +108,8 @@ class ScimEndpointIT {
           .extracting(ScimUserResponse::meta)
           .extracting(ScimUserResponse.ScimUserMeta::location)
           .allMatch(location ->
-              location.matches("^http://localhost:[0-9]+/realms/test/scim/v2/Users/[0-9a-fA-F-]+$"));
+              location.matches(
+                  "^http://localhost:[0-9]+/realms/test/scim/v2/Users/[0-9a-fA-F-]+$"));
     }
 
     @Test
@@ -316,6 +317,34 @@ class ScimEndpointIT {
           );
       assertThat(body.meta().location()).matches(
           "^http://localhost:[0-9]+/realms/test/scim/v2/Users/[0-9a-fA-F-]+$");
+      ScimUserResponse created = RestAssured.given()
+          .header("Authorization", "Bearer " + token)
+          .get(body.meta().location())
+          .then()
+          .statusCode(200)
+          .extract().as(new TypeRef<>() {
+          });
+      assertThat(created)
+          .extracting(
+              ScimUserResponse::schemas,
+              ScimUserResponse::userName,
+              ScimUserResponse::active,
+              u -> u.name().familyName(),
+              u -> u.name().givenName(),
+              u -> u.emails().getFirst().value(),
+              u -> u.emails().getFirst().primary(),
+              u -> u.meta().resourceType()
+          )
+          .containsExactly(
+              List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
+              "shiro.saito@example.org",
+              true,
+              "Saito",
+              "Shiro",
+              "shiro.saito@example.org",
+              true,
+              "User"
+          );
     }
   }
 
@@ -409,6 +438,34 @@ class ScimEndpointIT {
           );
       assertThat(body.meta().location()).matches(
           "^http://localhost:[0-9]+/realms/test/scim/v2/Users/0196EE58-EF67-C007-A708-00C1700184C2$");
+      ScimUserResponse updated = RestAssured.given()
+          .header("Authorization", "Bearer " + token)
+          .get(body.meta().location())
+          .then()
+          .statusCode(200)
+          .extract().as(new TypeRef<>() {
+          });
+      assertThat(updated)
+          .extracting(
+              ScimUserResponse::schemas,
+              ScimUserResponse::userName,
+              ScimUserResponse::active,
+              u -> u.name().familyName(),
+              u -> u.name().givenName(),
+              u -> u.emails().getFirst().value(),
+              u -> u.emails().getFirst().primary(),
+              u -> u.meta().resourceType()
+          )
+          .containsExactly(
+              List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
+              "taro.sato@example.org",
+              false,
+              "sato",
+              "taro",
+              "taro.sato@example.com",
+              true,
+              "User"
+          );
     }
 
     @Test
@@ -488,6 +545,34 @@ class ScimEndpointIT {
           );
       assertThat(body.meta().location()).matches(
           "^http://localhost:[0-9]+/realms/test/scim/v2/Users/0196EE58-EF67-C007-A708-00C1700184C2$");
+      ScimUserResponse updated = RestAssured.given()
+          .header("Authorization", "Bearer " + token)
+          .get(body.meta().location())
+          .then()
+          .statusCode(200)
+          .extract().as(new TypeRef<>() {
+          });
+      assertThat(updated)
+          .extracting(
+              ScimUserResponse::schemas,
+              ScimUserResponse::userName,
+              ScimUserResponse::active,
+              u -> u.name().familyName(),
+              u -> u.name().givenName(),
+              u -> u.emails().getFirst().value(),
+              u -> u.emails().getFirst().primary(),
+              u -> u.meta().resourceType()
+          )
+          .containsExactly(
+              List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
+              "taro.sato@example.org",
+              false,
+              null,
+              null,
+              null,
+              true,
+              "User"
+          );
     }
   }
 }
