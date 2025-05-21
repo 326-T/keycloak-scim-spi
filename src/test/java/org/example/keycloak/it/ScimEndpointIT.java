@@ -227,6 +227,12 @@ class ScimEndpointIT {
   @DisplayName("SCIM API - Create User")
   class createUser {
 
+    @AfterAll
+    static void cleanup() {
+      keycloak.stop();
+      keycloak.start();
+    }
+
     @Test
     @DisplayName("新規ユーザー作成")
     void shouldCreateUser() {
@@ -293,9 +299,6 @@ class ScimEndpointIT {
               "shiro.saito@example.org",
               true
           );
-      // cleanup
-      keycloak.stop();
-      keycloak.start();
     }
   }
 

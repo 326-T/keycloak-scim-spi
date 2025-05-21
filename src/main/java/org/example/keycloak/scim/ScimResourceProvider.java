@@ -14,8 +14,8 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Objects;
 import org.example.keycloak.schemas.ScimListResponse;
-import org.example.keycloak.schemas.ScimPatchRequest;
-import org.example.keycloak.schemas.ScimUserRequest;
+import org.example.keycloak.schemas.ScimPatchUserRequest;
+import org.example.keycloak.schemas.ScimCreateUserRequest;
 import org.example.keycloak.schemas.ScimUserResponse;
 import org.example.keycloak.util.ScimFilterUtil;
 import org.keycloak.models.KeycloakSession;
@@ -81,7 +81,7 @@ public class ScimResourceProvider implements RealmResourceProvider {
   @Path("v2/Users")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response createUser(ScimUserRequest request) {
+  public Response createUser(ScimCreateUserRequest request) {
     RealmModel realm = session.getContext().getRealm();
     UserModel user = session.users().addUser(realm, request.userName());
     user.setFirstName(request.name().givenName());
@@ -99,13 +99,13 @@ public class ScimResourceProvider implements RealmResourceProvider {
   @Produces(MediaType.APPLICATION_JSON)
   public Response patchUser(
       @PathParam("userId") String userId,
-      ScimPatchRequest request) {
+      ScimPatchUserRequest request) {
     RealmModel realm = session.getContext().getRealm();
     UserModel user = session.users().getUserById(realm, userId);
     if (user == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    for (ScimPatchRequest.Operation operation : request.operations()) {
+    for (ScimPatchUserRequest.Operation operation : request.operations()) {
       if (Objects.equals(operation.op(), "Add") || Objects.equals(operation.op(), "Replace")) {
         switch (operation.path()) {
           case "name.givenName" -> user.setFirstName(operation.value());

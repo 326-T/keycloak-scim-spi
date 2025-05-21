@@ -2,6 +2,7 @@ package org.example.keycloak.schemas;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import org.example.keycloak.schemas.ScimCreateUserRequest.ScimUserMeta;
 import org.keycloak.models.UserModel;
 
 public record ScimUserResponse(
@@ -11,7 +12,8 @@ public record ScimUserResponse(
     List<ScimUserEmail> emails,
     String userName,
     String id,
-    boolean active
+    boolean active,
+    ScimUserMeta meta
 ) {
   public ScimUserResponse(
       UserModel user
@@ -22,7 +24,11 @@ public record ScimUserResponse(
         List.of(new ScimUserEmail(user.getEmail(), true)),
         user.getUsername(),
         user.getId(),
-        user.isEnabled()
+        user.isEnabled(),
+        new ScimUserMeta(
+            "User",
+            "/Users/" + user.getId()
+        )
     );
   }
 
@@ -42,8 +48,6 @@ public record ScimUserResponse(
 
   public record ScimUserMeta(
       String resourceType,
-      OffsetDateTime created,
-      OffsetDateTime lastModified,
       String location
   ) {
 

@@ -5,8 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record ScimPatchRequest(
-    @JsonProperty("schemas")
+public record ScimPatchUserRequest(
     List<String> schemas,
     @JsonProperty("Operations")
     List<Operation> operations
@@ -14,11 +13,8 @@ public record ScimPatchRequest(
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record Operation(
-      @JsonProperty("op")
       String op,
-      @JsonProperty("path")
       String path,
-      @JsonProperty("value")
       String value
   ) {
 
