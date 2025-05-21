@@ -219,4 +219,77 @@ class ScimEndpointIT {
           );
     }
   }
+
+  @Nested
+  @DisplayName("SCIM API - Create User")
+  class createUser {
+
+    @Test
+    @DisplayName("新規ユーザー作成")
+    void shouldCreateUser() {
+      // given
+      String token = RestAssured.given()
+          .contentType("application/x-www-form-urlencoded")
+          .formParam("grant_type", "password")
+          .formParam("client_id", "test-client")
+          .formParam("username", "test-user")
+          .formParam("password", "password")
+          .post(keycloak.getAuthServerUrl() + "/realms/test/protocol/openid-connect/token")
+          .then().extract().path("access_token");
+      // when
+      ScimUserResponse body = RestAssured.given()
+          .header("Authorization", "Bearer " + token)
+          .contentType("application/json")
+          .body("""
+              {
+                "schemas": [
+                  "urn:ietf:params:scim:schemas:core:2.0:User",
+                  "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+                ],
+                "externalId": "shiro.saito",
+                "userName": "shiro.saito@example.org",
+                "active": true,
+                "displayName": "Shiro Saito",
+                "emails": [
+                  { "primary": true, "type": "work", "value": "shiro.saito@example.org" }
+                ],
+                "meta": { "resourceType": "User" },
+                "name": {
+                  "formatted": "Shiro Saito",
+                  "familyName": "Saito",
+                  "givenName": "Shiro"
+                }
+              }
+              """)
+          .when()
+          .post(keycloak.getAuthServerUrl()
+              + "/realms/test/scim/v2/Users")
+
+          .then()
+          .statusCode(201)
+          .extract().as(new TypeRef<>() {
+          });
+      // then
+      assertThat(body.id()).isNotNull();
+      assertThat(body)
+          .extracting(
+              ScimUserResponse::schemas,
+              ScimUserResponse::userName,
+              ScimUserResponse::active,
+              u -> u.name().familyName(),
+              u -> u.name().givenName(),
+              u -> u.emails().getFirst().value(),
+              u -> u.emails().getFirst().primary()
+          )
+          .containsExactly(
+              List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
+              "shiro.saito@example.org",
+              true,
+              "Saito",
+              "Shiro",
+              "shiro.saito@example.org",
+              true
+          );
+    }
+  }
 }

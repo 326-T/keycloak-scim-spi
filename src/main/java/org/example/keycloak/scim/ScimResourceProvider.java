@@ -1,7 +1,9 @@
 package org.example.keycloak.scim;
 
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -10,6 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 import org.example.keycloak.schemas.ScimListResponse;
+import org.example.keycloak.schemas.ScimUserRequest;
 import org.example.keycloak.schemas.ScimUserResponse;
 import org.example.keycloak.util.ScimFilterUtil;
 import org.keycloak.models.KeycloakSession;
@@ -82,5 +85,28 @@ public class ScimResourceProvider implements RealmResourceProvider {
         user.isEnabled()
     );
     return Response.ok(response).build();
+  }
+
+  @POST
+  @Path("v2/Users")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response createUser(ScimUserRequest request) {
+    RealmModel realm = session.getContext().getRealm();
+    UserModel user = session.users().addUser(realm, request.userName());
+    user.setFirstName(request.name().givenName());
+    user.setLastName(request.name().familyName());
+    user.setEmail(request.emails().getFirst().value());
+    user.setEnabled(request.active());
+
+    ScimUserResponse response = new ScimUserResponse(
+        List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
+        new ScimUserResponse.ScimUserName(user.getLastName(), user.getFirstName()),
+        List.of(new ScimUserResponse.ScimUserEmail(user.getEmail(), true)),
+        user.getUsername(),
+        user.getId(),
+        user.isEnabled()
+    );
+    return Response.status(Response.Status.CREATED).entity(response).build();
   }
 }
