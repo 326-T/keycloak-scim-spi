@@ -290,6 +290,9 @@ class ScimEndpointIT {
               "shiro.saito@example.org",
               true
           );
+      // cleanup
+      keycloak.stop();
+      keycloak.start();
     }
   }
 }

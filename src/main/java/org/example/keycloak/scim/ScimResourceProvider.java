@@ -56,14 +56,7 @@ public class ScimResourceProvider implements RealmResourceProvider {
         count,
         startIndex,
         itemsPerPage,
-        users.stream().map(user -> new ScimUserResponse(
-            List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
-            new ScimUserResponse.ScimUserName(user.getLastName(), user.getFirstName()),
-            List.of(new ScimUserResponse.ScimUserEmail(user.getEmail(), true)),
-            user.getUsername(),
-            user.getId(),
-            user.isEnabled()
-        )).toList()
+        users.stream().map(ScimUserResponse::new).toList()
     );
     return Response.ok(response).build();
   }
@@ -76,14 +69,7 @@ public class ScimResourceProvider implements RealmResourceProvider {
     RealmModel realm = session.getContext().getRealm();
     UserModel user = session.users().getUserById(realm, userId);
 
-    ScimUserResponse response = new ScimUserResponse(
-        List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
-        new ScimUserResponse.ScimUserName(user.getLastName(), user.getFirstName()),
-        List.of(new ScimUserResponse.ScimUserEmail(user.getEmail(), true)),
-        user.getUsername(),
-        user.getId(),
-        user.isEnabled()
-    );
+    ScimUserResponse response = new ScimUserResponse(user);
     return Response.ok(response).build();
   }
 
@@ -99,14 +85,7 @@ public class ScimResourceProvider implements RealmResourceProvider {
     user.setEmail(request.emails().getFirst().value());
     user.setEnabled(request.active());
 
-    ScimUserResponse response = new ScimUserResponse(
-        List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
-        new ScimUserResponse.ScimUserName(user.getLastName(), user.getFirstName()),
-        List.of(new ScimUserResponse.ScimUserEmail(user.getEmail(), true)),
-        user.getUsername(),
-        user.getId(),
-        user.isEnabled()
-    );
+    ScimUserResponse response = new ScimUserResponse(user);
     return Response.status(Response.Status.CREATED).entity(response).build();
   }
 }
