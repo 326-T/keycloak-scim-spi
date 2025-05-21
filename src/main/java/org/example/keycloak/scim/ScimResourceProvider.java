@@ -82,7 +82,7 @@ public class ScimResourceProvider implements RealmResourceProvider {
 
   @POST
   @Path("v2/Users")
-  @Consumes(MediaType.APPLICATION_JSON)
+  @Consumes({MediaType.APPLICATION_JSON, "application/scim+json"})
   @Produces(MediaType.APPLICATION_JSON)
   public Response createUser(ScimCreateUserRequest request) {
     RealmModel realm = session.getContext().getRealm();
@@ -90,6 +90,7 @@ public class ScimResourceProvider implements RealmResourceProvider {
     user.setFirstName(request.name().givenName());
     user.setLastName(request.name().familyName());
     user.setEmail(request.emails().getFirst().value());
+    user.setEmailVerified(true);
     user.setEnabled(request.active());
 
     ScimUserResponse response = new ScimUserResponse(user, realm, session.getContext().getUri());
@@ -98,7 +99,7 @@ public class ScimResourceProvider implements RealmResourceProvider {
 
   @PATCH
   @Path("v2/Users/{userId}")
-  @Consumes(MediaType.APPLICATION_JSON)
+  @Consumes({MediaType.APPLICATION_JSON, "application/scim+json"})
   @Produces(MediaType.APPLICATION_JSON)
   public Response patchUser(
       @PathParam("userId") String userId,
@@ -113,7 +114,10 @@ public class ScimResourceProvider implements RealmResourceProvider {
         switch (operation.path()) {
           case "name.givenName" -> user.setFirstName(operation.value());
           case "name.familyName" -> user.setLastName(operation.value());
-          case "emails[type eq \"work\"].value" -> user.setEmail(operation.value());
+          case "emails[type eq \"work\"].value" -> {
+            user.setEmail(operation.value());
+            user.setEmailVerified(true);
+          }
           case "active" -> user.setEnabled(Boolean.parseBoolean(operation.value()));
           default -> {
             // Ignore unsupported operations
