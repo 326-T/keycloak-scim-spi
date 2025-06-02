@@ -15,6 +15,7 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: password
       KC_FEATURES: organization
     command: >
+      start
       --http-enabled=true
       --hostname-strict=false
       --hostname=localhost
