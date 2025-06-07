@@ -4,15 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Keycloak SPI (Service Provider Interface) that implements SCIM v2 user provisioning endpoints. The project allows external identity providers (like Entra ID) to manage users in Keycloak via SCIM protocol.
+This is a Keycloak SPI (Service Provider Interface) that implements SCIM v2 user provisioning endpoints. The project allows external identity providers (like Entra ID) to manage users in Keycloak via SCIM protocol. The project has been migrated from Java to Kotlin.
 
 ## Architecture
 
-- **ScimResourceProvider**: Main JAX-RS resource providing SCIM v2 endpoints (`/realms/{realm}/scim/v2/Users`)
-- **ScimResourceProviderFactory**: Factory for creating ScimResourceProvider instances
-- **Schema classes**: SCIM request/response DTOs in `org.example.keycloak.schemas`
-- **ScimFilterUtil**: Utility for parsing SCIM filter expressions
-- **HelloResourceProvider**: Example/test endpoint
+- **ScimResourceProvider**: Main JAX-RS resource providing SCIM v2 endpoints (`/realms/{realm}/scim/v2/Users`) - located in `org.example.keycloak.provider`
+- **ScimResourceProviderFactory**: Factory for creating ScimResourceProvider instances - located in `org.example.keycloak.provider`
+- **Schema classes**: SCIM request/response DTOs in `org.example.keycloak.schemas` (Kotlin data classes)
+- **ScimFilterUtil**: Utility for parsing SCIM filter expressions - located in `org.example.keycloak.util`
+- **HelloResourceProvider**: Example/test endpoint - located in `org.example.keycloak.provider`
+- **JacksonConfig**: JSON serialization configuration - located in `org.example.keycloak.config`
 
 The SPI is registered via `META-INF/services/org.keycloak.services.resource.RealmResourceProviderFactory`.
 
@@ -29,10 +30,10 @@ The SPI is registered via `META-INF/services/org.keycloak.services.resource.Real
 
 ### Testing
 ```bash
-# Run unit tests only (*Test.java)
+# Run unit tests only (*Test.kt)
 ./mvnw test
 
-# Run integration tests only (*IT.java)
+# Run integration tests only (*IT.kt)
 ./mvnw verify
 
 # Run all tests
