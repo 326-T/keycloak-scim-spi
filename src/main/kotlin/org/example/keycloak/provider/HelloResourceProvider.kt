@@ -1,4 +1,4 @@
-package org.example.keycloak.hello
+package org.example.keycloak.provider
 
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.Produces

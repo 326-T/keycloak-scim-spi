@@ -1,4 +1,4 @@
-package org.example.keycloak.it
+package org.example.keycloak.provider
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import io.restassured.RestAssured

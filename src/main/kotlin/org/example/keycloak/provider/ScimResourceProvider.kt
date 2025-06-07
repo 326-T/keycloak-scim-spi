@@ -1,4 +1,4 @@
-package org.example.keycloak.scim
+package org.example.keycloak.provider
 
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType

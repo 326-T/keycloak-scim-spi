@@ -1,4 +1,4 @@
-package org.example.keycloak.hello
+package org.example.keycloak.provider
 
 import org.keycloak.Config
 import org.keycloak.models.KeycloakSession
@@ -6,15 +6,15 @@ import org.keycloak.models.KeycloakSessionFactory
 import org.keycloak.services.resource.RealmResourceProvider
 import org.keycloak.services.resource.RealmResourceProviderFactory
 
-class HelloResourceProviderFactory : RealmResourceProviderFactory {
+class ScimResourceProviderFactory : RealmResourceProviderFactory {
     companion object {
-        const val ID = "hello"
+        const val ID = "scim"
     }
 
     override fun getId(): String = ID
 
     override fun create(session: KeycloakSession): RealmResourceProvider =
-        HelloResourceProvider(session)
+        ScimResourceProvider(session)
 
     override fun init(config: Config.Scope) {}
     override fun postInit(factory: KeycloakSessionFactory) {}
