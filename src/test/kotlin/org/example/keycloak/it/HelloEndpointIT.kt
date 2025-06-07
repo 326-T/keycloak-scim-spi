@@ -6,16 +6,20 @@ import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.io.File
 
 @Testcontainers
 class HelloEndpointIT {
 
     companion object {
         @Container
-        @JvmStatic
         val keycloak = KeycloakContainer("quay.io/keycloak/keycloak:26.2.4")
             .withRealmImportFile("/test-realm.json")
-            .withProviderClassesFrom("target/classes")
+            .withProviderLibsFrom(
+                listOf(
+                    File("target/keycloak-scim-spi-1.0-SNAPSHOT.jar")
+                )
+            )
     }
 
     @Test

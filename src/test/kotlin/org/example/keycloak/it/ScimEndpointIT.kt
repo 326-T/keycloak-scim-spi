@@ -7,7 +7,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.tuple
 import org.example.keycloak.schemas.ScimListResponse
 import org.example.keycloak.schemas.ScimUserResponse
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -15,16 +14,24 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.io.File
 
 @Testcontainers
 class ScimEndpointIT {
 
-    companion object {
-        @Container
-        @JvmStatic
-        val keycloak = KeycloakContainer("quay.io/keycloak/keycloak:26.2.4")
-            .withRealmImportFile("/test-realm.json")
-            .withProviderClassesFrom("target/classes")
+    @Container
+    val keycloak = KeycloakContainer("quay.io/keycloak/keycloak:26.2.4")
+        .withRealmImportFile("/test-realm.json")
+        .withProviderLibsFrom(
+            listOf(
+                File("target/keycloak-scim-spi-1.0-SNAPSHOT.jar")
+            )
+        )
+
+
+    private fun cleanup() {
+        keycloak.stop()
+        keycloak.start()
     }
 
     @Nested
@@ -246,12 +253,6 @@ class ScimEndpointIT {
     @DisplayName("SCIM API - Create User")
     inner class CreateUser {
 
-        @AfterAll
-        fun cleanup() {
-            keycloak.stop()
-            keycloak.start()
-        }
-
         @Test
         @DisplayName("新規ユーザー作成")
         fun shouldCreateUser() {
@@ -269,7 +270,8 @@ class ScimEndpointIT {
             val body = RestAssured.given()
                 .header("Authorization", "Bearer $token")
                 .contentType("application/json")
-                .body("""
+                .body(
+                    """
                     {
                       "schemas": [
                         "urn:ietf:params:scim:schemas:core:2.0:User",
@@ -289,7 +291,8 @@ class ScimEndpointIT {
                         "givenName": "Shiro"
                       }
                     }
-                    """.trimIndent())
+                    """.trimIndent()
+                )
                 .`when`()
                 .post("${keycloak.authServerUrl}/realms/test/scim/v2/Users")
                 .then()
@@ -322,14 +325,14 @@ class ScimEndpointIT {
             assertThat(body.meta.location).matches(
                 "^http://localhost:[0-9]+/realms/test/scim/v2/Users/[0-9a-fA-F-]+$"
             )
-            
+
             val created = RestAssured.given()
                 .header("Authorization", "Bearer $token")
                 .get(body.meta.location)
                 .then()
                 .statusCode(200)
                 .extract().`as`(object : TypeRef<ScimUserResponse>() {})
-            
+
             assertThat(created)
                 .extracting(
                     { it.schemas },
@@ -351,18 +354,13 @@ class ScimEndpointIT {
                     true,
                     "User"
                 )
+            cleanup()
         }
     }
 
     @Nested
     @DisplayName("SCIM API - Patch User")
     inner class PatchUser {
-
-        @AfterAll
-        fun cleanup() {
-            keycloak.stop()
-            keycloak.start()
-        }
 
         @ParameterizedTest
         @ValueSource(strings = ["Replace", "Add"])
@@ -382,7 +380,8 @@ class ScimEndpointIT {
             val body = RestAssured.given()
                 .header("Authorization", "Bearer $token")
                 .contentType("application/json")
-                .body("""
+                .body(
+                    """
                     {
                       "schemas": [
                         "urn:ietf:params:scim:api:messages:2.0:PatchOp"
@@ -410,7 +409,8 @@ class ScimEndpointIT {
                         }
                       ]
                     }
-                    """.trimIndent())
+                    """.trimIndent()
+                )
                 .`when`()
                 .patch("${keycloak.authServerUrl}/realms/test/scim/v2/Users/0196EE58-EF67-C007-A708-00C1700184C2")
                 .then()
@@ -442,14 +442,14 @@ class ScimEndpointIT {
             assertThat(body.meta.location).matches(
                 "^http://localhost:[0-9]+/realms/test/scim/v2/Users/0196EE58-EF67-C007-A708-00C1700184C2$"
             )
-            
+
             val updated = RestAssured.given()
                 .header("Authorization", "Bearer $token")
                 .get(body.meta.location)
                 .then()
                 .statusCode(200)
                 .extract().`as`(object : TypeRef<ScimUserResponse>() {})
-            
+
             assertThat(updated)
                 .extracting(
                     { it.schemas },
@@ -471,6 +471,7 @@ class ScimEndpointIT {
                     true,
                     "User"
                 )
+            cleanup()
         }
 
         @Test
@@ -490,7 +491,8 @@ class ScimEndpointIT {
             val body = RestAssured.given()
                 .header("Authorization", "Bearer $token")
                 .contentType("application/json")
-                .body("""
+                .body(
+                    """
                     {
                       "schemas": [
                         "urn:ietf:params:scim:api:messages:2.0:PatchOp"
@@ -518,7 +520,8 @@ class ScimEndpointIT {
                         }
                       ]
                     }
-                    """.trimIndent())
+                    """.trimIndent()
+                )
                 .`when`()
                 .patch("${keycloak.authServerUrl}/realms/test/scim/v2/Users/0196EE58-EF67-C007-A708-00C1700184C2")
                 .then()
@@ -550,14 +553,14 @@ class ScimEndpointIT {
             assertThat(body.meta.location).matches(
                 "^http://localhost:[0-9]+/realms/test/scim/v2/Users/0196EE58-EF67-C007-A708-00C1700184C2$"
             )
-            
+
             val updated = RestAssured.given()
                 .header("Authorization", "Bearer $token")
                 .get(body.meta.location)
                 .then()
                 .statusCode(200)
                 .extract().`as`(object : TypeRef<ScimUserResponse>() {})
-            
+
             assertThat(updated)
                 .extracting(
                     { it.schemas },
@@ -579,6 +582,7 @@ class ScimEndpointIT {
                     true,
                     "User"
                 )
+            cleanup()
         }
     }
 }
