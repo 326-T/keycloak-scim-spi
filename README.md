@@ -21,6 +21,7 @@ KeycloakにSCIM v2ユーザープロビジョニング機能を追加するServi
 ## 必要要件
 
 - Java 21
+- Kotlin 1.9+
 - Maven 3.6+
 - Docker & Docker Compose（開発環境用）
 
@@ -69,17 +70,21 @@ docker-compose up --build
 ### コードの構成
 
 ```
-src/main/java/org/example/keycloak/
-├── scim/                    # SCIM API実装
-│   ├── ScimResourceProvider.java
-│   └── ScimResourceProviderFactory.java
+src/main/kotlin/org/example/keycloak/
+├── provider/                # リソースプロバイダー実装
+│   ├── ScimResourceProvider.kt
+│   ├── ScimResourceProviderFactory.kt
+│   ├── HelloResourceProvider.kt
+│   └── HelloResourceProviderFactory.kt
 ├── schemas/                 # SCIM データモデル
-│   ├── ScimCreateUserRequest.java
-│   ├── ScimUserResponse.java
-│   └── ...
+│   ├── ScimCreateUserRequest.kt
+│   ├── ScimUserResponse.kt
+│   ├── ScimListResponse.kt
+│   └── ScimPatchUserRequest.kt
 ├── util/                    # ユーティリティ
-│   └── ScimFilterUtil.java
-└── hello/                   # サンプルエンドポイント
+│   └── ScimFilterUtil.kt
+└── config/                  # 設定クラス
+    └── JacksonConfig.kt
 ```
 
 ### 統合テスト
